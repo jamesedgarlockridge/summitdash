@@ -589,30 +589,24 @@ export default function App() {
         </div>
 
         {/* EMERGENCY FOOTER */}
-        <footer className="mt-auto py-8 border-t border-white/5">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-col md:flex-row gap-x-8 gap-y-2 text-center md:text-left">
-              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
-                Emergency: <span className="ml-1">911</span>
-              </p>
-              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
-                KPVC Operations Manager: <span className="ml-1">(905) 885-9471</span>
-              </p>
-            </div>
-            
-            <div className="flex items-center gap-6">
-              <button 
-                onClick={() => setShowInfo(true)}
-                className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-all active:scale-95 group border border-white/5"
-                title="Operational Metadata"
-              >
-                <Icons.Info size={20} color={BRAND.cyan} />
-              </button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-                Kitt Peak VC Dashboard v2.6
-              </p>
-            </div>
-          </div>
+        <footer className="mt-auto py-8 border-t border-white/5 flex flex-col items-center justify-center gap-4 text-center">
+          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
+            Emergency: <span className="ml-1">911</span>
+          </p>
+          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
+            KPVC Operations Manager: <span className="ml-1">(905) 885-9471</span>
+          </p>
+          
+          <button 
+            onClick={() => setShowInfo(true)}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-all active:scale-95 group border border-white/5 mt-2"
+            title="Operational Metadata"
+          >
+            <Icons.Info size={20} color={BRAND.cyan} />
+          </button>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
+            Kitt Peak VC Dashboard v2.6
+          </p>
         </footer>
 
       </div>
