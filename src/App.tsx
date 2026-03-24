@@ -152,9 +152,9 @@ export default function App() {
     tempLow: '--', windRange: '--', coverMax: '--', status: 'Fetching Data...', detail: '', color: BRAND.status.error 
   });
   const [transients, setTransients] = useState<Record<string, any>>({ 
-    iss: { time: "--:--", note: "Initializing Web Scraper..." }, 
-    rocket: { time: "--:--", note: "Initializing Web Scraper..." }, 
-    tiangong: { time: "--:--", note: "Initializing Web Scraper..." } 
+    iss: { time: "None Tonight", note: "No pass in window" }, 
+    rocket: { time: "None Tonight", note: "No Vandenberg launch scheduled" }, 
+    tiangong: { time: "None Tonight", note: "No pass in window" } 
   });
   const [loading, setLoading] = useState({ weather: true, transients: true });
   const [showInfo, setShowInfo] = useState(false);
@@ -429,8 +429,8 @@ export default function App() {
                 </div>
                 
                 <div className="pt-4 border-t border-white/5">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                    Kitt Peak VC Dashboard created by James Edgar Lockridge with Gemini Canvas, 2026.
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                    Application by James Edgar Lockridge, 2026. Drafted with Gemini Canvas; developed in StackBlitz; version-controlled on GitHub; and deployed via Vercel.
                   </p>
                 </div>
               </div>
@@ -557,56 +557,79 @@ export default function App() {
               { id: 'iss', label: 'INTL. SPACE STATION PASS', icon: Icons.Satellite, link: 'https://www.astroviewer.net/iss/en/observation.php' },
               { id: 'rocket', label: 'VANDENBERG LAUNCH', icon: Icons.Rocket, link: 'https://spaceflightnow.com/launch-schedule/' },
               { id: 'tiangong', label: 'Tiangong Pass', icon: Icons.Satellite, link: 'https://www.astroviewer.net/iss/en/observation-css.php' }
-            ].map(ev => (
-              <a key={ev.id} href={ev.link} target="_blank" rel="noreferrer" className="block p-5 rounded-2xl flex justify-between items-center shadow-md transition-all border text-white hover:bg-black/10" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <IconBox icon={ev.icon} />
-                    {transients[ev.id]?.time !== "None Tonight" && transients[ev.id]?.time !== "Error" && transients[ev.id]?.time !== "--:--" && !loading.transients && (
-                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 shadow-lg" style={{ backgroundColor: BRAND.cyan, borderColor: BRAND.navy }}></div>
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="font-black text-lg uppercase leading-none mb-1.5">{ev.label}</h4>
-                    <p className="text-[9px] font-medium uppercase opacity-70 line-clamp-1 max-w-[150px] text-gray-300">
-                        {loading.transients ? "Executing Web Scrape..." : transients[ev.id]?.note}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                    <div className="text-xl font-black tabular-nums">
-                        {loading.transients ? "--:--" : transients[ev.id]?.time}
+            ].map(ev => {
+              const data = transients[ev.id];
+              const isNoneTonight = data?.time === "None Tonight";
+
+              return (
+                <a key={ev.id} href={ev.link} target="_blank" rel="noreferrer" className="block p-5 rounded-2xl flex justify-between items-center shadow-md transition-all border text-white hover:bg-black/10" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <IconBox icon={ev.icon} />
+                      {!isNoneTonight && data?.time !== "Error" && data?.time !== "--:--" && !loading.transients && (
+                          <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 shadow-lg" style={{ backgroundColor: BRAND.cyan, borderColor: BRAND.navy }}></div>
+                      )}
                     </div>
-                    {!loading.transients && transients[ev.id]?.time !== "None Tonight" && transients[ev.id]?.time !== "Error" && (
-                         <div className="text-[8px] font-bold uppercase flex items-center gap-1 justify-end mt-1" style={{ color: BRAND.cyan }}>
-                            Confirmed <Icons.ExternalLink size={8}/>
-                         </div>
-                    )}
-                </div>
-              </a>
-            ))}
+                    <div>
+                      <h4 className="font-black text-lg uppercase leading-none mb-1.5">{ev.label}</h4>
+                      <p className="text-[9px] font-medium uppercase opacity-70 line-clamp-1 max-w-[150px] text-gray-300">
+                          {loading.transients ? "Executing Web Scrape..." : data?.note}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                      {isNoneTonight ? (
+                        <div className="flex flex-col items-end leading-none">
+                          <span className="text-xl font-black uppercase">None</span>
+                          <span className="text-xl font-black uppercase">Tonight</span>
+                        </div>
+                      ) : (
+                        <div className="text-xl font-black tabular-nums">
+                            {loading.transients ? "--:--" : data?.time}
+                        </div>
+                      )}
+                      
+                      {!loading.transients && !isNoneTonight && data?.time !== "Error" && (
+                           <div className="text-[8px] font-bold uppercase flex items-center gap-1 justify-end mt-1.5" style={{ color: BRAND.cyan }}>
+                              Confirmed <Icons.ExternalLink size={8}/>
+                           </div>
+                      )}
+                  </div>
+                </a>
+              );
+            })}
           </section>
         </div>
 
-        {/* EMERGENCY FOOTER */}
-        <footer className="mt-auto py-8 border-t border-white/5 flex flex-col items-center justify-center gap-4 text-center">
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
-            Emergency: <span className="ml-1">911</span>
-          </p>
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
-            KPVC Operations Manager: <span className="ml-1">(905) 885-9471</span>
-          </p>
+        {/* EMERGENCY FOOTER - VERTICAL LAYOUT */}
+        <footer className="mt-auto py-10 border-t border-white/5 flex flex-col items-center justify-center gap-6 text-center">
           
+          {/* Contacts Stack */}
+          <div className="flex flex-col items-center gap-3">
+            <a href="tel:911" className="text-[11px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity" style={{ color: BRAND.daygloOrange }}>
+              Emergency: 911
+            </a>
+            <a href="tel:9058859471" className="text-[11px] font-black uppercase tracking-widest hover:opacity-80 transition-opacity" style={{ color: BRAND.daygloOrange }}>
+              KPVC Operations Manager: (905) 885-9471
+            </a>
+          </div>
+          
+          {/* Info Icon */}
           <button 
             onClick={() => setShowInfo(true)}
-            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-all active:scale-95 group border border-white/5 mt-2"
+            className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-all active:scale-95 border border-white/5"
             title="Operational Metadata"
           >
             <Icons.Info size={20} color={BRAND.cyan} />
           </button>
-          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-            Kitt Peak VC Dashboard v2.6
-          </p>
+          
+          {/* Credits Stack */}
+          <div className="flex flex-col items-center gap-1.5 opacity-60">
+             <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+               Kitt Peak VC Dashboard v2.7
+             </p>
+          </div>
+          
         </footer>
 
       </div>
