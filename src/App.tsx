@@ -7,7 +7,8 @@ const BRAND = {
   navy: '#163A58',          
   slate: '#2B5D82',         
   blue: '#4B9CD3',          
-  cyan: '#75D1F5',          
+  cyan: '#75D1F5',
+  daygloOrange: '#FF5F1F',         
   status: {
     ideal: '#10B981',       
     fair: '#F59E0B',        
@@ -45,6 +46,9 @@ const Icons = {
   ),
   ThermometerSnowflake: ({ size = 24, color = "currentColor", className = "" }: any) => (
     <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/><path d="M2 12h10"/><path d="M9 4v4"/><path d="M15 4v4"/><path d="M12 2v2"/><path d="M12 8l-2 2"/><path d="M12 8l2 2"/></svg>
+  ),
+  X: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
   )
 };
 
@@ -153,6 +157,7 @@ export default function App() {
     tiangong: { time: "--:--", note: "Initializing Web Scraper..." } 
   });
   const [loading, setLoading] = useState({ weather: true, transients: true });
+  const [showInfo, setShowInfo] = useState(false);
 
   const moon = useMemo(() => getMoonData(selectedDate), [selectedDate]);
   const sunset = useMemo(() => calculateSellsSunset(selectedDate), [selectedDate]);
@@ -381,8 +386,61 @@ export default function App() {
 
   return (
     <div className="min-h-screen p-4 md:p-8 font-sans selection:bg-[#4B9CD3]/30" style={{ backgroundColor: BRAND.bgApp }}>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto flex flex-col min-h-[90vh]">
         
+        {/* INFO MODAL OVERLAY */}
+        {showInfo && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="bg-[#163A58] border border-[#2B5D82] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+              <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/20">
+                <h2 className="text-xl font-black uppercase tracking-widest text-[#75D1F5]">Telemetry Sources & Failsafes</h2>
+                <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                  <Icons.X size={24} color="white" />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto space-y-6 text-sm">
+                <div>
+                  <h3 className="text-[#10B981] font-black uppercase text-xs mb-2 tracking-widest">Program Conditions</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    Sourced from NOAA National Weather Service (NWS) Grid APIs using Kitt Peak's precise GPS coordinates. 
+                    Failsafe: System employs an exponential backoff retry logic and hard-coded mathematical fallbacks to ensure dashboard stability during API outages.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#4B9CD3] font-black uppercase text-xs mb-2 tracking-widest">Astronomical Calculations</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    Sunset, Nightfall, and Moon Phase data are generated via internal high-precision astronomical algorithms calibrated for 31.78° N. 
+                    Failsafe: Zero external dependencies; these values calculate correctly 100% of the time without an internet connection.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#F59E0B] font-black uppercase text-xs mb-2 tracking-widest">Satellite Telemetry</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    ISS and Tiangong overflights are scraped live from Heavens-Above DOM tables. 
+                    Failsafe: Employs a triple-proxy failover system (AllOrigins, CodeTabs, CorsProxy) to bypass CORS restrictions and regional network blocks.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#FF5F1F] font-black uppercase text-xs mb-2 tracking-widest">Rocket Launch Data</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    SpaceFlightNow schedule tables are parsed for Vandenberg-specific mission strings. 
+                    Failsafe: Real-time parsing ensures immediate updates for T-minus delays or scrubbed missions that static schedules miss.
+                  </p>
+                </div>
+                
+                <div className="pt-4 border-t border-white/5">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                    Kitt Peak VC Dashboard created by James Edgar Lockridge with Gemini Canvas, 2026.
+                  </p>
+                </div>
+              </div>
+              <div className="p-4 bg-black/40 text-center">
+                <p className="text-[10px] text-[#4B9CD3] font-black uppercase tracking-[0.2em]">Operational Integrity Protocol Active</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <header className="mb-10 flex flex-col md:flex-row justify-between items-end border-b pb-6 border-white/10">
           <div className="w-full md:w-auto">
             <div className="mb-6 flex flex-wrap gap-x-3">
@@ -442,7 +500,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <section className="p-8 rounded-[2rem] space-y-8 flex flex-col shadow-lg border text-white" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
             <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] flex items-center gap-2" style={{ color: BRAND.cyan }}>
                 Atmospheric Profile
@@ -529,6 +587,34 @@ export default function App() {
             ))}
           </section>
         </div>
+
+        {/* EMERGENCY FOOTER */}
+        <footer className="mt-auto py-8 border-t border-white/5">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex flex-col md:flex-row gap-x-8 gap-y-2 text-center md:text-left">
+              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
+                Emergency: <span className="ml-1">911</span>
+              </p>
+              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: BRAND.daygloOrange }}>
+                KPVC Operations Manager: <span className="ml-1">(905) 885-9471</span>
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <button 
+                onClick={() => setShowInfo(true)}
+                className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-all active:scale-95 group border border-white/5"
+                title="Operational Metadata"
+              >
+                <Icons.Info size={20} color={BRAND.cyan} />
+              </button>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
+                Kitt Peak VC Dashboard v2.6
+              </p>
+            </div>
+          </div>
+        </footer>
+
       </div>
     </div>
   );
