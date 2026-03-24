@@ -1,20 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { 
-  Wind, 
-  Cloud, 
-  Rocket, 
-  Satellite,
-  MapPin,
-  Clock,
-  Info,
-  ExternalLink,
-  ThermometerSnowflake
-} from 'lucide-react';
 
 // --- STYLING & BRAND THEME ---
 const BRAND = {
   bgApp: '#05070A',         
-  textGray: '#484848',      // Dark gray matching the Kitt Peak logo
+  textGray: '#484848',      
   navy: '#163A58',          
   slate: '#2B5D82',         
   blue: '#4B9CD3',          
@@ -28,14 +17,45 @@ const BRAND = {
   }
 };
 
+// --- INTERNAL SVG ICONS (Bypasses 'lucide-react' build error) ---
+const Icons = {
+  Wind: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
+  ),
+  Cloud: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+  ),
+  Rocket: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.5-1 1-4c2 0 3 .5 3 .5"/><path d="M15 20s-1 .5-4 1c0-2 .5-3 .5-3"/></svg>
+  ),
+  Satellite: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 7 9 3 5 7l4 4Z"/><path d="m17 11 4 4-4 4-4-4Z"/><path d="m4.5 15.5 2 2"/><path d="m15.5 4.5 2 2"/><path d="m2 12 2.5 2.5"/><path d="m12 2 2.5 2.5"/><path d="m20 12-2.5-2.5"/><path d="m12 20-2.5-2.5"/><path d="m9 15 3-3"/><path d="m11 17 3-3"/></svg>
+  ),
+  MapPin: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+  ),
+  Clock: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  ),
+  Info: ({ size = 24, color = "currentColor", className = "" }: any) => (
+    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+  ),
+  ExternalLink: ({ size = 24, color = "currentColor" }: any) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+  ),
+  ThermometerSnowflake: ({ size = 24, color = "currentColor", className = "" }: any) => (
+    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/><path d="M2 12h10"/><path d="M9 4v4"/><path d="M15 4v4"/><path d="M12 2v2"/><path d="M12 8l-2 2"/><path d="M12 8l2 2"/></svg>
+  )
+};
+
 // --- ASTRONOMICAL ENGINE ---
-const calculateSellsSunset = (dateStr) => {
+const calculateSellsSunset = (dateStr: string) => {
   const LAT = 31.7801;
   const LON = -111.5730; 
   const TIMEZONE = -7; 
   const targetDate = new Date(`${dateStr}T12:00:00`);
   const start = new Date(targetDate.getFullYear(), 0, 0);
-  const diff = targetDate - start;
+  const diff = targetDate.getTime() - start.getTime();
   const n = Math.floor(diff / (1000 * 60 * 60 * 24));
   const gamma = (2 * Math.PI / 365) * (n - 1);
   const eqt = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
@@ -53,13 +73,13 @@ const calculateSellsSunset = (dateStr) => {
   return `${hours % 12 || 12}:${mins.toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
 };
 
-const calculateNightfall = (dateStr) => {
+const calculateNightfall = (dateStr: string) => {
   const LAT = 31.7801;
   const LON = -111.5730; 
   const TIMEZONE = -7; 
   const targetDate = new Date(`${dateStr}T12:00:00`);
   const start = new Date(targetDate.getFullYear(), 0, 0);
-  const diff = targetDate - start;
+  const diff = targetDate.getTime() - start.getTime();
   const n = Math.floor(diff / (1000 * 60 * 60 * 24));
   const gamma = (2 * Math.PI / 365) * (n - 1);
   const eqt = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
@@ -79,7 +99,7 @@ const calculateNightfall = (dateStr) => {
   return `${hours % 12 || 12}:${mins.toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
 };
 
-const getMoonData = (dateStr) => {
+const getMoonData = (dateStr: string) => {
   const lp = 2551443; 
   const now = new Date(`${dateStr}T12:00:00Z`);
   const newMoon = new Date("1970-01-07T20:35:00Z");
@@ -90,7 +110,7 @@ const getMoonData = (dateStr) => {
   return { pos, illum: Math.round(illum * 100), name };
 };
 
-const fetchWithRetry = async (url, options, retries = 3, backoff = 1000) => {
+const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, backoff = 1000): Promise<any> => {
   try {
     const response = await fetch(url, options);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -104,13 +124,13 @@ const fetchWithRetry = async (url, options, retries = 3, backoff = 1000) => {
   }
 };
 
-const IconBox = ({ icon: Icon, moonPos }) => (
+const IconBox = ({ icon: Icon, moonPos }: { icon?: any, moonPos?: number }) => (
   <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shrink-0" style={{ backgroundColor: BRAND.blue }}>
-    {Icon ? <Icon size={24} strokeWidth={2.5} color="#FFFFFF" /> : <MoonGraphic pos={moonPos} />}
+    {Icon ? <Icon size={24} color="#FFFFFF" /> : <MoonGraphic pos={moonPos || 0} />}
   </div>
 );
 
-const MoonGraphic = ({ pos }) => {
+const MoonGraphic = ({ pos }: { pos: number }) => {
   const sweep = pos > 0.5 ? 0 : 1;
   const radius = 10;
   const shadowX = radius * Math.cos(pos * 2 * Math.PI);
@@ -127,7 +147,7 @@ export default function App() {
   const [weather, setWeather] = useState({ 
     tempLow: '--', windRange: '--', coverMax: '--', status: 'Fetching Data...', detail: '', color: BRAND.status.error 
   });
-  const [transients, setTransients] = useState({ 
+  const [transients, setTransients] = useState<Record<string, any>>({ 
     iss: { time: "--:--", note: "Initializing Web Scraper..." }, 
     rocket: { time: "--:--", note: "Initializing Web Scraper..." }, 
     tiangong: { time: "--:--", note: "Initializing Web Scraper..." } 
@@ -158,7 +178,7 @@ export default function App() {
           headers: { 'User-Agent': 'KittPeakObservatoryApp/1.0' }
         });
 
-        const parseDuration = (durationStr) => {
+        const parseDuration = (durationStr: string) => {
             let hours = 0;
             const daysMatch = durationStr.match(/P(\d+)D/);
             if (daysMatch) hours += parseInt(daysMatch[1], 10) * 24;
@@ -168,7 +188,7 @@ export default function App() {
             return hours || 1; 
         };
 
-        const getValueForTime = (valuesArray, targetTimeMs) => {
+        const getValueForTime = (valuesArray: any[], targetTimeMs: number) => {
           if (!valuesArray) return null;
           for (const item of valuesArray) {
             const [timeStr, durationStr] = item.validTime.split('/');
@@ -181,9 +201,9 @@ export default function App() {
         };
 
         const targetHours = [18, 19, 20, 21, 22]; 
-        const windowTempsF = [];
-        const windowWindsMph = [];
-        const windowCovers = [];
+        const windowTempsF: number[] = [];
+        const windowWindsMph: number[] = [];
+        const windowCovers: number[] = [];
 
         targetHours.forEach(hour => {
           const targetStr = `${selectedDate}T${hour.toString().padStart(2, '0')}:00:00-07:00`;
@@ -251,7 +271,7 @@ export default function App() {
     async function executeScrape() {
       setLoading(p => ({ ...p, transients: true }));
       
-      const results = {
+      const results: Record<string, any> = {
           iss: { time: "None Tonight", note: "No pass in window" },
           tiangong: { time: "None Tonight", note: "No pass in window" },
           rocket: { time: "None Tonight", note: "No Vandenberg launch scheduled" }
@@ -266,7 +286,7 @@ export default function App() {
         const sfnMonthStr = sfnMonthNames[dateObj.getMonth()];
         const fullMonthStr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][dateObj.getMonth()];
         
-        const fetchHtmlWithProxy = async (targetUrl) => {
+        const fetchHtmlWithProxy = async (targetUrl: string) => {
             const encodedUrl = encodeURIComponent(targetUrl);
             try {
                 const res = await fetch(`https://api.allorigins.win/get?url=${encodedUrl}`, { cache: 'no-store' });
@@ -286,19 +306,19 @@ export default function App() {
             throw new Error("All proxy routes blocked");
         };
 
-        const scrapePasses = async (satId) => {
+        const scrapePasses = async (satId: number) => {
             try {
                 const url = `https://heavens-above.com/PassSummary.aspx?satid=${satId}&lat=31.7801&lng=-111.5730&loc=Kitt+Peak&alt=2096&tz=MST`;
                 const html = await fetchHtmlWithProxy(url);
                 const doc = new DOMParser().parseFromString(html, "text/html");
-                const rows = doc.querySelectorAll('.standardTable tbody tr.clickableRow');
+                const rows = Array.from(doc.querySelectorAll('.standardTable tbody tr.clickableRow'));
                 for (let row of rows) {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length > 5 && cells[0].textContent.includes(haDateStr)) {
-                        const mag = cells[1].textContent.trim();
-                        const time24 = cells[2].textContent.trim(); 
-                        let [hh, mm] = time24.split(':');
-                        hh = parseInt(hh, 10);
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    if (cells.length > 5 && cells[0].textContent && cells[0].textContent.includes(haDateStr)) {
+                        const mag = cells[1].textContent?.trim() || "";
+                        const time24 = cells[2].textContent?.trim() || ""; 
+                        let [hhStr, mm] = time24.split(':');
+                        let hh = parseInt(hhStr, 10);
                         if (hh >= 18 && hh <= 22) {
                             const ampm = hh >= 12 ? 'PM' : 'AM';
                             const hh12 = hh % 12 || 12;
@@ -316,11 +336,11 @@ export default function App() {
             try {
                 const html = await fetchHtmlWithProxy('https://spaceflightnow.com/launch-schedule/');
                 const doc = new DOMParser().parseFromString(html, "text/html");
-                const datenames = doc.querySelectorAll('.datename');
+                const datenames = Array.from(doc.querySelectorAll('.datename'));
                 for (let el of datenames) {
-                    if ((el.textContent.includes(sfnMonthStr) || el.textContent.includes(fullMonthStr)) && el.textContent.includes(day.toString())) {
+                    if (el.textContent && (el.textContent.includes(sfnMonthStr) || el.textContent.includes(fullMonthStr)) && el.textContent.includes(day.toString())) {
                         const block = el.parentElement;
-                        if (block && block.textContent.includes('Vandenberg')) {
+                        if (block && block.textContent && block.textContent.includes('Vandenberg')) {
                             const mission = block.querySelector('.mission')?.textContent || "Launch Scheduled";
                             return { time: "Scheduled", note: `${mission.substring(0,25)} (SFN)` };
                         }
@@ -383,10 +403,10 @@ export default function App() {
           </div>
           <div className="text-right opacity-60 w-full md:w-auto mt-6 md:mt-0 text-gray-400">
             <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end">
-                <MapPin size={12}/> 31.7801° N, 111.5730° W
+                <Icons.MapPin size={12}/> 31.7801° N, 111.5730° W
             </p>
             <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end mt-1.5">
-                <Clock size={12}/> Observing Window: 6 PM – 10 PM
+                <Icons.Clock size={12}/> Observing Window: 6 PM – 10 PM
             </p>
           </div>
         </header>
@@ -415,7 +435,7 @@ export default function App() {
             </div>
             <div className="bg-black/10 p-5 rounded-2xl flex-1 md:min-w-[140px] text-center border border-black/5 backdrop-blur-md">
               <p className="text-[9px] font-black uppercase opacity-60 mb-2 flex justify-center items-center gap-1">
-                Program Low <ThermometerSnowflake size={10} className="opacity-70" />
+                Program Low <Icons.ThermometerSnowflake size={10} className="opacity-70" />
               </p>
               <p className="text-2xl font-black">{weather.tempLow}</p>
             </div>
@@ -438,14 +458,14 @@ export default function App() {
 
             <div className="grid grid-cols-2 gap-6 pt-6 border-t" style={{ borderColor: BRAND.slate }}>
               <div className="flex items-center gap-4">
-                <IconBox icon={Wind} />
+                <IconBox icon={Icons.Wind} />
                 <div>
                   <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400">Max Wind</p>
                   <p className="text-xl font-bold tabular-nums">{weather.windRange}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <IconBox icon={Cloud} />
+                <IconBox icon={Icons.Cloud} />
                 <div>
                   <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400">Cloud Cover</p>
                   <p className="text-xl font-bold tabular-nums">{weather.coverMax}</p>
@@ -454,7 +474,7 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-4 pt-4 border-t" style={{ borderColor: BRAND.slate }}>
-              <IconBox icon={Clock} />
+              <IconBox icon={Icons.Clock} />
               <div>
                 <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400">Astronomical Twilight (Nightfall)</p>
                 <p className="text-xl font-bold tabular-nums">{nightfall}</p>
@@ -462,7 +482,7 @@ export default function App() {
             </div>
 
             <div className="mt-auto p-4 rounded-xl flex gap-3 items-start bg-black/20 border" style={{ borderColor: BRAND.slate }}>
-                <Info size={14} className="shrink-0 mt-0.5" style={{ color: BRAND.cyan }} />
+                <Icons.Info size={14} className="shrink-0 mt-0.5" style={{ color: BRAND.cyan }} />
                 <p className="text-[10px] font-medium opacity-90 leading-relaxed uppercase tracking-wider text-gray-300">
                     Data verified from official NWS Graphical Forecast matching KPNO coordinates.
                 </p>
@@ -476,9 +496,9 @@ export default function App() {
             </div>
 
             {[
-              { id: 'iss', label: 'INTL. SPACE STATION PASS', icon: Satellite, link: 'https://www.astroviewer.net/iss/en/observation.php' },
-              { id: 'rocket', label: 'VANDENBERG LAUNCH', icon: Rocket, link: 'https://spaceflightnow.com/launch-schedule/' },
-              { id: 'tiangong', label: 'Tiangong Pass', icon: Satellite, link: 'https://www.astroviewer.net/iss/en/observation-css.php' }
+              { id: 'iss', label: 'INTL. SPACE STATION PASS', icon: Icons.Satellite, link: 'https://www.astroviewer.net/iss/en/observation.php' },
+              { id: 'rocket', label: 'VANDENBERG LAUNCH', icon: Icons.Rocket, link: 'https://spaceflightnow.com/launch-schedule/' },
+              { id: 'tiangong', label: 'Tiangong Pass', icon: Icons.Satellite, link: 'https://www.astroviewer.net/iss/en/observation-css.php' }
             ].map(ev => (
               <a key={ev.id} href={ev.link} target="_blank" rel="noreferrer" className="block p-5 rounded-2xl flex justify-between items-center shadow-md transition-all border text-white hover:bg-black/10" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
                 <div className="flex items-center gap-4">
@@ -501,7 +521,7 @@ export default function App() {
                     </div>
                     {!loading.transients && transients[ev.id]?.time !== "None Tonight" && transients[ev.id]?.time !== "Error" && (
                          <div className="text-[8px] font-bold uppercase flex items-center gap-1 justify-end mt-1" style={{ color: BRAND.cyan }}>
-                            Confirmed <ExternalLink size={8}/>
+                            Confirmed <Icons.ExternalLink size={8}/>
                          </div>
                     )}
                 </div>
