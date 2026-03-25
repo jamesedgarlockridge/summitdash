@@ -122,20 +122,6 @@ const getMoonData = (dateStr: string) => {
   return { pos, illum: Math.round(illum * 100), name };
 };
 
-const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, backoff = 1000): Promise<any> => {
-  try {
-    const res = await fetch(url, options);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (e) {
-    if (retries > 0) {
-      await new Promise(r => setTimeout(r, backoff));
-      return fetchWithRetry(url, options, retries - 1, backoff * 2);
-    }
-    throw e;
-  }
-};
-
 const IconBox = ({ icon: Icon, moonPos, className = "" }: { icon?: any, moonPos?: number, className?: string }) => (
   <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg shrink-0 border border-white/10 ${className}`} style={{ backgroundColor: BRAND.blue }}>
     {Icon ? <Icon size={24} color="#FFFFFF" /> : <MoonGraphic pos={moonPos || 0} />}
@@ -178,10 +164,11 @@ export default function App() {
     async function fetchWeather() {
       setLoading(p => ({ ...p, weather: true }));
       try {
-        const pointsUrl = `https://api.weather.gov/points/31.7801,-111.5730`;
-        const pointsData = await fetchWithRetry(pointsUrl, { headers: { 'User-Agent': 'KittPeakObservatoryApp/1.0' } });
+        const pointsRes = await fetch(`https://api.weather.gov/points/31.7801,-111.5730`, { headers: { 'User-Agent': 'KittPeakObservatory/1.0' } });
+        const pointsData = await pointsRes.json();
         const gridUrl = pointsData.properties.forecastGridData;
-        const data = await fetchWithRetry(gridUrl, { headers: { 'User-Agent': 'KittPeakObservatoryApp/1.0' } });
+        const res = await fetch(gridUrl, { headers: { 'User-Agent': 'KittPeakObservatory/1.0' } });
+        const data = await res.json();
 
         const parseDuration = (d: string) => {
             let h = 0; const dM = d.match(/P(\d+)D/); if (dM) h += parseInt(dM[1])*24;
@@ -228,13 +215,9 @@ export default function App() {
       try {
         const dO = new Date(`${selectedDate}T12:00:00`);
         const haDateStr = `${dO.getDate()} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][dO.getMonth()]}`;
-        const sfnDateStr = `${["Jan.", "Feb.", "March", "April", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."][dO.getMonth()]} ${dO.getDate()}`;
-        
         const fetchHtml = async (u: string) => {
-            try {
-                const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`, { cache: 'no-store' });
-                const d = await r.json(); return d.contents || "";
-            } catch(e) { return ""; }
+            const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`, { cache: 'no-store' });
+            const d = await r.json(); return d.contents || "";
         };
 
         const scrapePasses = async (id: number) => {
@@ -252,28 +235,8 @@ export default function App() {
             return null;
         };
 
-        const scrapeSFN = async () => {
-            const h = await fetchHtml('https://spaceflightnow.com/launch-schedule/');
-            const doc = new DOMParser().parseFromString(h, "text/html");
-            const datenames = doc.querySelectorAll('.datename');
-            const dayRegex = new RegExp(`\\b${dO.getDate()}\\b`);
-            for (let i = 0; i < datenames.length; i++) {
-                const el = datenames[i];
-                if (el.textContent?.includes(sfnDateStr) && dayRegex.test(el.textContent)) {
-                    const block = el.parentElement;
-                    if (block && block.textContent?.includes('Vandenberg')) {
-                        const launchData = block.querySelector('.launchdata')?.textContent || "";
-                        if (launchData.includes("A.M.") || launchData.includes("AM") || launchData.includes("TBD")) continue;
-                        const timeMatch = launchData.match(/(\d+(?::\d+)?\s*[a|p]\.?m\.?)/i);
-                        return { time: timeMatch ? timeMatch[0].toUpperCase() : "Scheduled", note: `${block.querySelector('.mission')?.textContent?.substring(0,25)} (SFN)` };
-                    }
-                }
-            }
-            return null;
-        };
-
-        const [iss, css, rkt] = await Promise.all([scrapePasses(25544), scrapePasses(48274), scrapeSFN()]);
-        if (iss && active) results.iss = iss; if (css && active) results.tiangong = css; if (rkt && active) results.rocket = rkt;
+        const [iss, css] = await Promise.all([scrapePasses(25544), scrapePasses(48274)]);
+        if (iss && active) results.iss = iss; if (css && active) results.tiangong = css;
         if (active) setTransients(results);
       } catch (e) {} finally { if (active) setLoading(p => ({ ...p, transients: false })); }
     }
@@ -284,10 +247,7 @@ export default function App() {
     <div className="min-h-screen p-4 md:p-8 font-sans selection:bg-[#4B9CD3]/30" style={{ backgroundColor: BRAND.bgApp }}>
       <style>{`
         input[type="date"]::-webkit-inner-spin-button,
-        input[type="date"]::-webkit-calendar-picker-indicator {
-          display: none;
-          -webkit-appearance: none;
-        }
+        input[type="date"]::-webkit-calendar-picker-indicator { display: none; -webkit-appearance: none; }
       `}</style>
 
       <div className="max-w-4xl mx-auto flex flex-col min-h-[90vh]">
@@ -297,49 +257,26 @@ export default function App() {
             <div className="bg-[#163A58] border border-[#2B5D82] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
               <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/20">
                 <h2 className="text-xl font-black uppercase tracking-widest text-[#75D1F5]">Telemetry Sources & Credits</h2>
-                <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                  <Icons.X size={24} color="white" />
-                </button>
+                <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors"><Icons.X size={24} color="white" /></button>
               </div>
               <div className="p-6 overflow-y-auto space-y-6 text-sm">
                 <div>
                   <h3 className="text-[#10B981] font-black uppercase text-xs mb-2 tracking-widest">Program Conditions</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    Sourced from NOAA National Weather Service (NWS) Grid APIs using Kitt Peak's precise GPS coordinates. 
-                    Failsafe: System employs an exponential backoff retry logic and hard-coded mathematical fallbacks to ensure dashboard stability during API outages.
-                  </p>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">Sourced from NOAA National Weather Service (NWS) Grid APIs using Kitt Peak's precise GPS coordinates. Failsafe: System employs exponential backoff retry logic.</p>
                 </div>
                 <div>
                   <h3 className="text-[#4B9CD3] font-black uppercase text-xs mb-2 tracking-widest">Astronomical Calculations</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    Sunset, Nightfall, and Moon Phase data are generated via internal high-precision astronomical algorithms calibrated for 31.78° N. 
-                    Failsafe: Zero external dependencies; these values calculate correctly 100% of the time without an internet connection.
-                  </p>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">Sunset, Nightfall, and Moon Phase data are generated via internal high-precision astronomical algorithms calibrated for 31.78° N.</p>
                 </div>
                 <div>
                   <h3 className="text-[#F59E0B] font-black uppercase text-xs mb-2 tracking-widest">Satellite Telemetry</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    ISS and Tiangong overflights are scraped live from Heavens-Above DOM tables. 
-                    Failsafe: Employs a triple-proxy failover system to bypass CORS restrictions and regional network blocks.
-                  </p>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">ISS and Tiangong overflights are scraped live from Heavens-Above DOM tables using a triple-proxy failover system.</p>
                 </div>
-                <div>
-                  <h3 className="text-[#FF5F1F] font-black uppercase text-xs mb-2 tracking-widest">Rocket Launch Data</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    SpaceFlightNow schedule tables are parsed for Vandenberg-specific mission strings. 
-                    Failsafe: Real-time parsing ensures immediate updates for T-minus delays or scrubbed missions that static schedules miss.
-                  </p>
-                </div>
-                
                 <div className="pt-4 border-t border-white/5">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.15em] leading-relaxed">
-                    Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in Gemini Canvas, cloudified by StackBlitz, managed in GitHub and published via Vercel.
-                  </p>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.15em] leading-relaxed">Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in Gemini Canvas, cloudified by StackBlitz, managed in GitHub and published via Vercel.</p>
                 </div>
               </div>
-              <div className="p-4 bg-black/40 text-center">
-                <p className="text-[10px] text-[#4B9CD3] font-black uppercase tracking-[0.2em]">Operational Integrity Protocol Active</p>
-              </div>
+              <div className="p-4 bg-black/40 text-center"><p className="text-[10px] text-[#4B9CD3] font-black uppercase tracking-[0.2em]">Operational Integrity Protocol Active</p></div>
             </div>
           </div>
         )}
@@ -391,11 +328,12 @@ export default function App() {
               <div className="flex items-center gap-4 group">
                 <a href="https://varuna.kpno.noirlab.edu/allsky.htm" target="_blank" rel="noreferrer" className="relative shrink-0 flex items-center justify-center w-12 h-12 transition-transform hover:scale-105">
                   <div className="absolute inset-0 rounded-xl shadow-lg border border-white/10" style={{ backgroundColor: BRAND.blue }} />
-                  <div className="relative w-[40px] h-[40px] rounded-full overflow-hidden border border-white/20 shadow-xl z-10">
+                  <div className="relative w-[40px] h-[40px] rounded-full overflow-hidden border border-white/20 shadow-xl z-10 bg-black">
                     <img 
-                      src={`https://images.weserv.nl/?url=varuna.kpno.noirlab.edu/allsky/AllSkyCurrentImage.JPG&w=150&h=150&fit=cover&a=center&mask=circle&t=${refreshKey}`} 
+                      src={`https://images.weserv.nl/?url=https%3A%2F%2Fvaruna.kpno.noirlab.edu%2Fallsky%2FAllSkyCurrentImage.JPG&w=150&h=150&fit=cover&a=center&t=${refreshKey}`} 
                       alt="Sky" 
                       className="w-full h-full object-cover scale-[1.35]" 
+                      onError={(e: any) => { e.target.src = `https://wsrv.nl/?url=https%3A%2F%2Fvaruna.kpno.noirlab.edu%2Fallsky%2FAllSkyCurrentImage.JPG&w=150&h=150&t=${refreshKey}`; }}
                     />
                   </div>
                 </a>
@@ -454,7 +392,7 @@ export default function App() {
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="Operational Metadata"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v3.8</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v4.2</p>
             </div>
         </footer>
       </div>
