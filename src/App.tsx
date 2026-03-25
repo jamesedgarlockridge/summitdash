@@ -162,10 +162,17 @@ export default function App() {
   });
   const [loading, setLoading] = useState({ weather: true, transients: true });
   const [showInfo, setShowInfo] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(Date.now());
 
   const moon = useMemo(() => getMoonData(selectedDate), [selectedDate]);
   const sunset = useMemo(() => calculateSellsSunset(selectedDate), [selectedDate]);
   const nightfall = useMemo(() => calculateNightfall(selectedDate), [selectedDate]);
+
+  // AUTO-REFRESH LIVE THUMBNAIL EVERY 60S
+  useEffect(() => {
+    const interval = setInterval(() => setRefreshKey(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -286,7 +293,6 @@ export default function App() {
 
       <div className="max-w-4xl mx-auto flex flex-col min-h-[90vh]">
         
-        {/* INFO MODAL OVERLAY */}
         {showInfo && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-[#163A58] border border-[#2B5D82] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
@@ -328,7 +334,7 @@ export default function App() {
                 
                 <div className="pt-4 border-t border-white/5">
                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.15em] leading-relaxed">
-                    Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in StackBlitz, managed in GitHub and published via Vercel.
+                    Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in Gemini Canvas, cloudified by StackBlitz, managed in GitHub and published via Vercel.
                   </p>
                 </div>
               </div>
@@ -352,7 +358,6 @@ export default function App() {
           </div>
         </header>
 
-        {/* GREEN CARTOUCHE - CENTERED */}
         <div className="rounded-3xl p-8 mb-8 shadow-2xl flex flex-col justify-center items-center gap-6 relative overflow-hidden text-[#05070A]" style={{ backgroundColor: weather.color }}>
           {loading.weather && <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-10 font-bold uppercase tracking-widest text-sm animate-pulse">Syncing NWS...</div>}
           <div className="text-center w-full relative z-0">
@@ -362,7 +367,7 @@ export default function App() {
           </div>
           <div className="flex gap-4 w-full md:w-auto justify-center relative z-0">
             <div className="bg-black/10 p-5 rounded-2xl flex-1 md:min-w-[140px] text-center border border-black/5"><p className="text-[9px] font-black uppercase opacity-60 mb-2">Sunset (Local)</p><p className="text-2xl font-black">{sunset}</p></div>
-            <div className="bg-black/10 p-5 rounded-2xl flex-1 md:min-w-[140px] text-center border border-black/5"><p className="text-[9px] font-black uppercase opacity-60 mb-2">Program Low</p><p className="text-2xl font-black">{weather.tempLow}</p></div>
+            <div className="bg-black/10 p-5 rounded-2xl flex-1 md:min-w-[140px] text-center border border-black/5"><p className="text-[9px] font-black uppercase opacity-60 mb-2 flex justify-center items-center gap-1">Program Low <Icons.ThermometerSnowflake size={10} /></p><p className="text-2xl font-black">{weather.tempLow}</p></div>
           </div>
         </div>
 
@@ -384,9 +389,15 @@ export default function App() {
               <div className="flex items-center gap-4"><IconBox icon={Icons.Clock} /><div className="text-left"><p className="text-[9px] font-bold uppercase opacity-60 text-gray-400">Nightfall</p><p className="text-xl font-bold tabular-nums">{nightfall}</p></div></div>
               
               <div className="flex items-center gap-4 group">
-                <a href="https://varuna.kpno.noirlab.edu/allsky.htm" target="_blank" rel="noreferrer" className="relative shrink-0 flex items-center justify-center w-12 h-12 group transition-transform group-hover:scale-105">
+                <a href="https://varuna.kpno.noirlab.edu/allsky.htm" target="_blank" rel="noreferrer" className="relative shrink-0 flex items-center justify-center w-12 h-12 transition-transform hover:scale-105">
                   <div className="absolute inset-0 rounded-xl shadow-lg border border-white/10" style={{ backgroundColor: BRAND.blue }} />
-                  <div className="relative w-[40px] h-[40px] rounded-full overflow-hidden border border-white/20 shadow-xl z-10"><img src="https://images.weserv.nl/?url=varuna.kpno.noirlab.edu/allsky/AllSkyCurrentImage.JPG&w=150&h=150&fit=cover&a=center&mask=circle" alt="Sky" className="w-full h-full object-cover scale-[1.35]" /></div>
+                  <div className="relative w-[40px] h-[40px] rounded-full overflow-hidden border border-white/20 shadow-xl z-10">
+                    <img 
+                      src={`https://images.weserv.nl/?url=varuna.kpno.noirlab.edu/allsky/AllSkyCurrentImage.JPG&w=150&h=150&fit=cover&a=center&mask=circle&t=${refreshKey}`} 
+                      alt="Sky" 
+                      className="w-full h-full object-cover scale-[1.35]" 
+                    />
+                  </div>
                 </a>
                 <div className="text-left">
                   <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400">All-Sky Camera</p>
