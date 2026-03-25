@@ -31,14 +31,9 @@ const Icons = {
   ),
   SpaceStation: ({ size = 24, color = "currentColor", className = "" }: any) => (
     <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      {/* Central modules */}
-      <path d="M9 12h6" />
-      <path d="M12 9v6" />
+      <path d="M9 12h6M12 9v6" />
       <rect x="10.5" y="10.5" width="3" height="3" rx="0.5" />
-      {/* Long Outward Trusses */}
-      <path d="M4 12h5" />
-      <path d="M15 12h5" />
-      {/* Protruding Solar Arrays (Sticking out far) */}
+      <path d="M4 12h5M15 12h5" />
       <rect x="2" y="5" width="2" height="14" rx="0.5" />
       <rect x="5" y="5" width="2" height="14" rx="0.5" />
       <rect x="17" y="5" width="2" height="14" rx="0.5" />
@@ -281,6 +276,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen p-4 md:p-8 font-sans selection:bg-[#4B9CD3]/30" style={{ backgroundColor: BRAND.bgApp }}>
+      {/* GLOBAL CSS TO HIDE CALENDAR ICON */}
+      <style>{`
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+          display: none;
+          -webkit-appearance: none;
+        }
+      `}</style>
+
       <div className="max-w-4xl mx-auto flex flex-col min-h-[90vh]">
         
         {showInfo && (
@@ -329,7 +333,8 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <section className="p-8 rounded-[2rem] space-y-8 flex flex-col shadow-lg border text-white" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: BRAND.cyan }}>Atmospheric Profile</h3>
+            {/* UPDATED HEADER WITH WINDOW */}
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: BRAND.cyan }}>Atmospheric Profile (6pm–10pm)</h3>
             
             <div className="flex items-center gap-6">
               <IconBox moonPos={moon.pos} />
@@ -358,7 +363,10 @@ export default function App() {
               <div className="flex items-center gap-4 group">
                 <a href="https://www.wunderground.com/dashboard/pws/KAZSELLS7" target="_blank" rel="noreferrer" className="shrink-0 transition-transform group-hover:scale-105 block"><IconBox icon={Icons.Stars} /></a>
                 <div className="text-left">
-                  <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400 flex items-end gap-1 mb-1"><span className="text-[9px] leading-none">KPNO</span> <span className="leading-none">WU Local Station</span></p>
+                  {/* CLEANED UP STATION TEXT FOR MOBILE FLOW */}
+                  <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400 mb-1 leading-tight">
+                    KPNO WU Local Station
+                  </p>
                   <a href="https://www.wunderground.com/dashboard/pws/KAZSELLS7" target="_blank" rel="noreferrer" className="text-xl font-bold uppercase tracking-tight flex items-center gap-2 text-white hover:text-[#75D1F5] transition-colors">Current WX <Icons.ExternalLink size={14} className="opacity-80" /></a>
                 </div>
               </div>
