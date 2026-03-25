@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 // --- STYLING & BRAND THEME ---
 const BRAND = {
@@ -90,7 +90,9 @@ const calculateSellsSunset = (dateStr: string) => {
   const zenithRad = 90.833 * (Math.PI / 180); const latRad = LAT * (Math.PI / 180);
   let cosHa = (Math.cos(zenithRad) / (Math.cos(latRad) * Math.cos(decl))) - (Math.tan(latRad) * Math.tan(decl));
   cosHa = Math.max(Math.min(cosHa, 1), -1);
-  const sunsetUtc = 720 - (4 * LON) - eqt + (4 * Math.acos(cosHa) * (180 / Math.PI));
+  const ha = Math.acos(cosHa) * (180 / Math.PI);
+  const solarNoonUtc = 720 - (4 * LON) - eqt;
+  const sunsetUtc = solarNoonUtc + (4 * ha);
   const sunsetLocalMinutes = (sunsetUtc + (TIMEZONE * 60)) % 1440;
   const h = Math.floor(sunsetLocalMinutes / 60); const m = Math.floor(sunsetLocalMinutes % 60);
   return `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
@@ -108,7 +110,9 @@ const calculateNightfall = (dateStr: string) => {
   const zenithRad = 108 * (Math.PI / 180); const latRad = LAT * (Math.PI / 180);
   let cosHa = (Math.cos(zenithRad) / (Math.cos(latRad) * Math.cos(decl))) - (Math.tan(latRad) * Math.tan(decl));
   cosHa = Math.max(Math.min(cosHa, 1), -1);
-  const darkUtc = 720 - (4 * LON) - eqt + (4 * Math.acos(cosHa) * (180 / Math.PI));
+  const ha = Math.acos(cosHa) * (180 / Math.PI);
+  const solarNoonUtc = 720 - (4 * LON) - eqt;
+  const darkUtc = solarNoonUtc + (4 * ha);
   const darkLocalMinutes = (darkUtc + (TIMEZONE * 60)) % 1440;
   const h = Math.floor(darkLocalMinutes / 60); const m = Math.floor(darkLocalMinutes % 60);
   return `${h % 12 || 12}:${m.toString().padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
@@ -400,7 +404,7 @@ export default function App() {
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v3.4</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v3.5</p>
             </div>
         </footer>
       </div>
