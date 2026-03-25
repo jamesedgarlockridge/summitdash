@@ -276,7 +276,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen p-4 md:p-8 font-sans selection:bg-[#4B9CD3]/30" style={{ backgroundColor: BRAND.bgApp }}>
-      {/* GLOBAL CSS TO HIDE CALENDAR ICON */}
       <style>{`
         input[type="date"]::-webkit-inner-spin-button,
         input[type="date"]::-webkit-calendar-picker-indicator {
@@ -287,18 +286,54 @@ export default function App() {
 
       <div className="max-w-4xl mx-auto flex flex-col min-h-[90vh]">
         
+        {/* INFO MODAL OVERLAY */}
         {showInfo && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-[#163A58] border border-[#2B5D82] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
               <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/20">
-                <h2 className="text-xl font-black uppercase tracking-widest text-[#75D1F5]">Telemetry Sources</h2>
-                <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors"><Icons.X size={24} color="white" /></button>
+                <h2 className="text-xl font-black uppercase tracking-widest text-[#75D1F5]">Telemetry Sources & Credits</h2>
+                <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                  <Icons.X size={24} color="white" />
+                </button>
               </div>
-              <div className="p-6 overflow-y-auto space-y-6 text-sm text-gray-300 uppercase font-bold tracking-widest leading-loose">
-                  <p>Point-forecast Grid v3 via NOAA/NWS APIs.</p>
-                  <p>Satellite scraping via Heavens-Above MST calibrated elevation model.</p>
-                  <p>Vandenberg telemetry via SpaceFlightNow DOM parsing.</p>
-                  <div className="pt-4 border-t border-white/5 opacity-60">Created with Gemini Canvas Pro 2026.</div>
+              <div className="p-6 overflow-y-auto space-y-6 text-sm">
+                <div>
+                  <h3 className="text-[#10B981] font-black uppercase text-xs mb-2 tracking-widest">Program Conditions</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    Sourced from NOAA National Weather Service (NWS) Grid APIs using Kitt Peak's precise GPS coordinates. 
+                    Failsafe: System employs an exponential backoff retry logic and hard-coded mathematical fallbacks to ensure dashboard stability during API outages.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#4B9CD3] font-black uppercase text-xs mb-2 tracking-widest">Astronomical Calculations</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    Sunset, Nightfall, and Moon Phase data are generated via internal high-precision astronomical algorithms calibrated for 31.78° N. 
+                    Failsafe: Zero external dependencies; these values calculate correctly 100% of the time without an internet connection.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#F59E0B] font-black uppercase text-xs mb-2 tracking-widest">Satellite Telemetry</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    ISS and Tiangong overflights are scraped live from Heavens-Above DOM tables. 
+                    Failsafe: Employs a triple-proxy failover system to bypass CORS restrictions and regional network blocks.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#FF5F1F] font-black uppercase text-xs mb-2 tracking-widest">Rocket Launch Data</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    SpaceFlightNow schedule tables are parsed for Vandenberg-specific mission strings. 
+                    Failsafe: Real-time parsing ensures immediate updates for T-minus delays or scrubbed missions that static schedules miss.
+                  </p>
+                </div>
+                
+                <div className="pt-4 border-t border-white/5">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.15em] leading-relaxed">
+                    Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in StackBlitz, managed in GitHub and published via Vercel.
+                  </p>
+                </div>
+              </div>
+              <div className="p-4 bg-black/40 text-center">
+                <p className="text-[10px] text-[#4B9CD3] font-black uppercase tracking-[0.2em]">Operational Integrity Protocol Active</p>
               </div>
             </div>
           </div>
@@ -317,7 +352,7 @@ export default function App() {
           </div>
         </header>
 
-        {/* GREEN CARTOUCHE - CENTERED FIX */}
+        {/* GREEN CARTOUCHE - CENTERED */}
         <div className="rounded-3xl p-8 mb-8 shadow-2xl flex flex-col justify-center items-center gap-6 relative overflow-hidden text-[#05070A]" style={{ backgroundColor: weather.color }}>
           {loading.weather && <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-10 font-bold uppercase tracking-widest text-sm animate-pulse">Syncing NWS...</div>}
           <div className="text-center w-full relative z-0">
@@ -333,7 +368,6 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <section className="p-8 rounded-[2rem] space-y-8 flex flex-col shadow-lg border text-white" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
-            {/* UPDATED HEADER WITH WINDOW */}
             <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: BRAND.cyan }}>Atmospheric Profile (6pm–10pm)</h3>
             
             <div className="flex items-center gap-6">
@@ -362,11 +396,8 @@ export default function App() {
 
               <div className="flex items-center gap-4 group">
                 <a href="https://www.wunderground.com/dashboard/pws/KAZSELLS7" target="_blank" rel="noreferrer" className="shrink-0 transition-transform group-hover:scale-105 block"><IconBox icon={Icons.Stars} /></a>
-                <div className="text-left">
-                  {/* CLEANED UP STATION TEXT FOR MOBILE FLOW */}
-                  <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400 mb-1 leading-tight">
-                    KPNO WU Local Station
-                  </p>
+                <div className="text-left overflow-hidden min-w-0 flex-1">
+                  <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400 mb-1 leading-tight whitespace-nowrap">KPNO WU Local Station</p>
                   <a href="https://www.wunderground.com/dashboard/pws/KAZSELLS7" target="_blank" rel="noreferrer" className="text-xl font-bold uppercase tracking-tight flex items-center gap-2 text-white hover:text-[#75D1F5] transition-colors">Current WX <Icons.ExternalLink size={14} className="opacity-80" /></a>
                 </div>
               </div>
@@ -411,8 +442,8 @@ export default function App() {
               <a href="tel:5202500407" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: BRAND.daygloOrange }}>Telescope Engineer: (520) 250-0407</a>
             </div>
             <div className="flex items-center gap-6">
-              <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v3.5</p>
+              <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="Operational Metadata"><Icons.Info size={20} color={BRAND.cyan} /></button>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v3.7</p>
             </div>
         </footer>
       </div>
