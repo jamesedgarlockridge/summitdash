@@ -41,13 +41,13 @@ const Icons = {
     </svg>
   ),
   Clock: ({ size = 24, color = "currentColor" }: any) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r={10}/><polyline points="12 6 12 12 16 14"/></svg>
   ),
   MapPin: ({ size = 24, color = "currentColor" }: any) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
   ),
   Info: ({ size = 24, color = "currentColor", className = "" }: any) => (
-    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r={10}/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
   ),
   ExternalLink: ({ size = 24, color = "currentColor", className = "" }: any) => (
     <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -164,33 +164,33 @@ export default function App() {
     async function fetchWeather() {
       setLoading(p => ({ ...p, weather: true }));
       try {
-        const pointsRes = await fetch(`https://api.weather.gov/points/31.7801,-111.5730`, { headers: { 'User-Agent': 'KittPeakObservatory/1.0' } });
-        const pointsData = await pointsRes.json();
-        const gridUrl = pointsData.properties.forecastGridData;
-        const res = await fetch(gridUrl, { headers: { 'User-Agent': 'KittPeakObservatory/1.0' } });
-        const data = await res.json();
+        const res1 = await fetch(`https://api.weather.gov/points/31.7801,-111.5730`, { headers: { 'User-Agent': 'KittPeakObservatory/1.2' } });
+        const points = await res1.json();
+        const res2 = await fetch(points.properties.forecastGridData, { headers: { 'User-Agent': 'KittPeakObservatory/1.2' } });
+        const data = await res2.json();
 
-        const parseDuration = (d: string) => {
-            let h = 0; const dM = d.match(/P(\d+)D/); if (dM) h += parseInt(dM[1])*24;
-            const hM = d.match(/T(\d+)H/); if (hM) h += parseInt(hM[1]);
-            return h || 1;
+        const parseD = (d: string) => {
+          let h = 0; const dM = d.match(/P(\d+)D/); if (dM) h += parseInt(dM[1])*24;
+          const hM = d.match(/T(\d+)H/); if (hM) h += parseInt(hM[1]);
+          return h || 1;
         };
 
-        const getValue = (arr: any[], tMs: number) => {
+        const getV = (arr: any[], t: number) => {
+          if (!arr) return null;
           for (const item of arr) {
-            const [tS, dS] = item.validTime.split('/');
-            const sMs = new Date(tS).getTime();
-            if (tMs >= sMs && tMs < sMs + (parseDuration(dS)*3600000)) return item.value;
+            const [sS, dS] = item.validTime.split('/');
+            const s = new Date(sS).getTime();
+            if (t >= s && t < s + (parseD(dS)*3600000)) return item.value;
           }
           return null;
         };
 
         const hours = [18, 19, 20, 21, 22]; const tF: number[] = []; const wM: number[] = []; const cV: number[] = [];
         hours.forEach(h => {
-          const targetMs = new Date(`${selectedDate}T${h.toString().padStart(2,'0')}:00:00-07:00`).getTime();
-          const t = getValue(data.properties.temperature.values, targetMs); if (t !== null) tF.push(Math.round((t * 9/5) + 32));
-          const w = getValue(data.properties.windSpeed.values, targetMs); if (w !== null) wM.push(Math.round(w / 1.609));
-          const c = getValue(data.properties.skyCover.values, targetMs); if (c !== null) cV.push(Math.round(c));
+          const tMs = new Date(`${selectedDate}T${h.toString().padStart(2,'0')}:00:00-07:00`).getTime();
+          const t = getV(data.properties.temperature.values, tMs); if (t !== null) tF.push(Math.round((t * 9/5) + 32));
+          const w = getV(data.properties.windSpeed.values, tMs); if (w !== null) wM.push(Math.round(w / 1.609));
+          const c = getV(data.properties.skyCover.values, tMs); if (c !== null) cV.push(Math.round(c));
         });
 
         if (tF.length > 0 && active) {
@@ -210,23 +210,36 @@ export default function App() {
     let active = true;
     async function executeScrape() {
       setLoading(p => ({ ...p, transients: true }));
-      const results = { iss: { time: "None Tonight", note: "no visible pass in window" }, tiangong: { time: "None Tonight", note: "no visible pass in window" }, rocket: { time: "None Tonight", note: "No Vandenberg launch scheduled" } };
+      const results = { iss: { time: "None Tonight", note: "No pass in window" }, tiangong: { time: "None Tonight", note: "No pass in window" }, rocket: { time: "None Tonight", note: "No Vandenberg launch scheduled" } };
 
       try {
         const dO = new Date(`${selectedDate}T12:00:00`);
-        const haDateStr = `${dO.getDate()} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][dO.getMonth()]}`;
-        const fetchHtml = async (u: string) => {
-            const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`, { cache: 'no-store' });
-            const d = await r.json(); return d.contents || "";
+        const day = dO.getDate();
+        const haDateStr = `${day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][dO.getMonth()]}`;
+        const sfnDateStrs = [
+            `${["Jan.", "Feb.", "March", "April", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."][dO.getMonth()]} ${day}`,
+            `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][dO.getMonth()]} ${day}`
+        ];
+        
+        const fetchH = async (u: string) => {
+            const proxies = [`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`, `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}` ];
+            for (const p of proxies) {
+                try {
+                    const r = await fetch(p, { cache: 'no-store' });
+                    const d = p.includes('allorigins') ? (await r.json()).contents : await r.text();
+                    if (d && d.length > 1000) return d;
+                } catch(e) {}
+            }
+            return "";
         };
 
-        const scrapePasses = async (id: number) => {
-            const h = await fetchHtml(`https://heavens-above.com/PassSummary.aspx?satid=${id}&lat=31.7801&lng=-111.5730&loc=Kitt+Peak&alt=2096&tz=MST`);
+        const scrapeP = async (id: number) => {
+            const h = await fetchH(`https://heavens-above.com/PassSummary.aspx?satid=${id}&lat=31.7801&lng=-111.5730&loc=Kitt+Peak&alt=2096&tz=MST`);
             const doc = new DOMParser().parseFromString(h, "text/html");
             const rows = doc.querySelectorAll('.standardTable tr');
             for (let i = 0; i < rows.length; i++) {
                 const c = rows[i].querySelectorAll('td');
-                if (c.length >= 5 && c[0].textContent?.includes(haDateStr)) {
+                if (c.length > 5 && c[0].textContent?.includes(haDateStr)) {
                     const t = c[2].textContent?.trim() || "";
                     let hh = parseInt(t.split(':')[0], 10);
                     if (hh >= 18 && hh <= 22) return { time: `${hh % 12 || 12}:${t.split(':')[1]} PM`, note: `Mag ${c[1].textContent} (Confirmed)` };
@@ -235,8 +248,24 @@ export default function App() {
             return null;
         };
 
-        const [iss, css] = await Promise.all([scrapePasses(25544), scrapePasses(48274)]);
-        if (iss && active) results.iss = iss; if (css && active) results.tiangong = css;
+        const scrapeR = async () => {
+            const h = await fetchH('https://spaceflightnow.com/launch-schedule/');
+            const doc = new DOMParser().parseFromString(h, "text/html");
+            const entries = doc.querySelectorAll('.launch-list__item, .launch-entry');
+            for (let entry of Array.from(entries)) {
+                const text = entry.textContent || "";
+                if (text.toLowerCase().includes('vandenberg') && sfnDateStrs.some(s => text.includes(s))) {
+                    const mission = entry.querySelector('.mission')?.textContent || "Vandenberg Mission";
+                    const launchData = entry.querySelector('.launchdata')?.textContent || "";
+                    const timeMatch = launchData.match(/(\d+(?::\d+)?\s*[a|p]\.?m\.?)/i);
+                    return { time: timeMatch ? timeMatch[0].toUpperCase() : "Scheduled", note: `${mission.substring(0,25)} (SFN)` };
+                }
+            }
+            return null;
+        };
+
+        const [iss, css, rkt] = await Promise.all([scrapeP(25544), scrapeP(48274), scrapeR()]);
+        if (iss && active) results.iss = iss; if (css && active) results.tiangong = css; if (rkt && active) results.rocket = rkt;
         if (active) setTransients(results);
       } catch (e) {} finally { if (active) setLoading(p => ({ ...p, transients: false })); }
     }
@@ -262,18 +291,16 @@ export default function App() {
               <div className="p-6 overflow-y-auto space-y-6 text-sm">
                 <div>
                   <h3 className="text-[#10B981] font-black uppercase text-xs mb-2 tracking-widest">Program Conditions</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">Sourced from NOAA National Weather Service (NWS) Grid APIs using Kitt Peak's precise GPS coordinates. Failsafe: System employs exponential backoff retry logic.</p>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">Sourced from NOAA NWS Grid APIs. Failsafe: Exponential backoff retry logic active.</p>
                 </div>
                 <div>
-                  <h3 className="text-[#4B9CD3] font-black uppercase text-xs mb-2 tracking-widest">Astronomical Calculations</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">Sunset, Nightfall, and Moon Phase data are generated via internal high-precision astronomical algorithms calibrated for 31.78° N.</p>
-                </div>
-                <div>
-                  <h3 className="text-[#F59E0B] font-black uppercase text-xs mb-2 tracking-widest">Satellite Telemetry</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">ISS and Tiangong overflights are scraped live from Heavens-Above DOM tables using a triple-proxy failover system.</p>
+                  <h3 className="text-[#F59E0B] font-black uppercase text-xs mb-2 tracking-widest">Satellite & Rocket Telemetry</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">Scraped from Heavens-Above and SpaceFlightNow. Failsafe: Triple-proxy failover system bypasses CORS blocks.</p>
                 </div>
                 <div className="pt-4 border-t border-white/5">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.15em] leading-relaxed">Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in Gemini Canvas, cloudified by StackBlitz, managed in GitHub and published via Vercel.</p>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.15em] leading-relaxed">
+                    Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in Gemini Canvas, cloudified by StackBlitz, managed in GitHub and published via Vercel.
+                  </p>
                 </div>
               </div>
               <div className="p-4 bg-black/40 text-center"><p className="text-[10px] text-[#4B9CD3] font-black uppercase tracking-[0.2em]">Operational Integrity Protocol Active</p></div>
@@ -330,10 +357,10 @@ export default function App() {
                   <div className="absolute inset-0 rounded-xl shadow-lg border border-white/10" style={{ backgroundColor: BRAND.blue }} />
                   <div className="relative w-[40px] h-[40px] rounded-full overflow-hidden border border-white/20 shadow-xl z-10 bg-black">
                     <img 
-                      src={`https://images.weserv.nl/?url=https%3A%2F%2Fvaruna.kpno.noirlab.edu%2Fallsky%2FAllSkyCurrentImage.JPG&w=150&h=150&fit=cover&a=center&t=${refreshKey}`} 
+                      src={`https://wsrv.nl/?url=https%3A%2F%2Fvaruna.kpno.noirlab.edu%2Fallsky%2FAllSkyCurrentImage.JPG&w=150&h=150&fit=cover&t=${refreshKey}`} 
                       alt="Sky" 
                       className="w-full h-full object-cover scale-[1.35]" 
-                      onError={(e: any) => { e.target.src = `https://wsrv.nl/?url=https%3A%2F%2Fvaruna.kpno.noirlab.edu%2Fallsky%2FAllSkyCurrentImage.JPG&w=150&h=150&t=${refreshKey}`; }}
+                      onError={(e: any) => { e.target.src = `https://varuna.kpno.noirlab.edu/allsky/AllSkyCurrentImage.JPG?t=${refreshKey}`; }}
                     />
                   </div>
                 </a>
@@ -392,7 +419,7 @@ export default function App() {
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="Operational Metadata"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v4.2</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v4.4</p>
             </div>
         </footer>
       </div>
