@@ -168,7 +168,6 @@ export default function App() {
   const sunset = useMemo(() => calculateSellsSunset(selectedDate), [selectedDate]);
   const nightfall = useMemo(() => calculateNightfall(selectedDate), [selectedDate]);
 
-  // AUTO-REFRESH LIVE THUMBNAIL EVERY 60S
   useEffect(() => {
     const interval = setInterval(() => setRefreshKey(Date.now()), 60000);
     return () => clearInterval(interval);
@@ -354,10 +353,11 @@ export default function App() {
           </div>
           <div className="text-right opacity-60 w-full md:w-auto mt-6 md:mt-0 text-gray-400">
             <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end text-gray-400"><Icons.MapPin size={12} /> 31.7801° N, -111.5730° W</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end mt-1.5 text-gray-400"><Icons.Clock size={12} /> Observing Window: 6 PM – 10 PM</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end mt-1.5 text-gray-400"><Icons.Clock size={12} /> Program Window: 6 PM – 10 PM</p>
           </div>
         </header>
 
+        {/* GREEN CARTOUCHE - CENTERED */}
         <div className="rounded-3xl p-8 mb-8 shadow-2xl flex flex-col justify-center items-center gap-6 relative overflow-hidden text-[#05070A]" style={{ backgroundColor: weather.color }}>
           {loading.weather && <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-10 font-bold uppercase tracking-widest text-sm animate-pulse">Syncing NWS...</div>}
           <div className="text-center w-full relative z-0">
@@ -401,15 +401,15 @@ export default function App() {
                 </a>
                 <div className="text-left">
                   <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400">All-Sky Camera</p>
-                  <a href="https://varuna.kpno.noirlab.edu/allsky.htm" target="_blank" rel="noreferrer" className="text-xl font-bold uppercase tracking-tight flex items-center gap-2 text-white hover:text-[#75D1F5] transition-colors">Live View <Icons.ExternalLink size={14} className="opacity-80" /></a>
+                  <a href="https://varuna.kpno.noirlab.edu/allsky.htm" target="_blank" rel="noreferrer" className="text-xl font-bold uppercase tracking-tight flex items-center gap-2 text-white hover:text-[#75D1F5] transition-colors">Live Sky <Icons.ExternalLink size={14} className="opacity-80" /></a>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 group">
                 <a href="https://www.wunderground.com/dashboard/pws/KAZSELLS7" target="_blank" rel="noreferrer" className="shrink-0 transition-transform group-hover:scale-105 block"><IconBox icon={Icons.Stars} /></a>
                 <div className="text-left overflow-hidden min-w-0 flex-1">
-                  <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400 mb-1 leading-tight whitespace-nowrap">KPNO WU Local Station</p>
-                  <a href="https://www.wunderground.com/dashboard/pws/KAZSELLS7" target="_blank" rel="noreferrer" className="text-xl font-bold uppercase tracking-tight flex items-center gap-2 text-white hover:text-[#75D1F5] transition-colors">Current WX <Icons.ExternalLink size={14} className="opacity-80" /></a>
+                  <p className="text-[9px] font-bold uppercase opacity-60 text-gray-400 mb-1 leading-tight">Local Station</p>
+                  <a href="https://www.wunderground.com/dashboard/pws/KAZSELLS7" target="_blank" rel="noreferrer" className="text-xl font-bold uppercase tracking-tight flex items-center gap-2 text-white hover:text-[#75D1F5] transition-colors">WX Now <Icons.ExternalLink size={14} className="opacity-80" /></a>
                 </div>
               </div>
             </div>
@@ -454,7 +454,7 @@ export default function App() {
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="Operational Metadata"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v3.7</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v3.8</p>
             </div>
         </footer>
       </div>
