@@ -49,7 +49,9 @@ const Icons = {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
   ),
   Info: ({ size = 24, color = "currentColor", className = "" }: any) => (
-    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r={10}/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <svg className={className} width={size} height={size} viewBox="182 119 136 262" style={{ color }}>
+      <g transform="translate(0,500) scale(0.1,-0.1)" fill="currentColor"><path d="M2363 3736 c-103 -34 -176 -98 -222 -196 -22 -47 -26 -68 -26 -145 1 -79 4 -97 30 -148 34 -68 107 -140 173 -169 72 -33 191 -36 264 -8 76 28 159 104 195 178 25 50 28 68 28 152 0 79 -4 103 -24 142 -60 122 -173 198 -304 204 -43 3 -89 -2 -114 -10z M2335 2794 c-170 -7 -343 -13 -382 -13 l-73 -1 0 -80 0 -80 103 0 c124 0 168 -11 201 -51 l26 -31 0 -514 c0 -554 -1 -568 -52 -595 -13 -7 -73 -15 -140 -17 l-118 -4 0 -79 0 -79 610 0 610 0 0 79 0 78 -102 5 c-120 5 -160 21 -177 69 -8 22 -11 232 -11 680 l0 649 -92 -1 c-51 -1 -232 -8 -403 -15z"/></g>
+    </svg>
   ),
   ExternalLink: ({ size = 24, color = "currentColor", className = "" }: any) => (
     <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
