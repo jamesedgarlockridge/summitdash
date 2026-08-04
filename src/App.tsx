@@ -557,7 +557,7 @@ export default function App() {
                 </div>
               </div>
               <div className="p-4 bg-black/40 text-center">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Free to all — no account, no ads, no cost</p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">This app is free. Enjoy the sky!</p>
               </div>
             </div>
           </div>
