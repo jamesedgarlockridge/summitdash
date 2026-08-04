@@ -654,7 +654,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
           <section className="p-8 rounded-[2rem] space-y-8 flex flex-col shadow-lg border text-white" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
             <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-center" style={{ color: BRAND.cyan }}>Atmospheric Profile (6pm–10pm)</h3>
 
