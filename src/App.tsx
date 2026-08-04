@@ -521,10 +521,9 @@ export default function App() {
                 <div className="flex flex-col items-center text-center gap-4 pb-2">
                   <img src={profilePhoto} alt="James Edgar Lockridge" className="w-48 h-48 rounded-full object-cover border border-white/10 shadow-xl" />
                   <p className="text-gray-300 leading-relaxed text-[13px] max-w-sm">
-                    Kitt Peak Dashboard is a personal project built by{' '}
+                    Kitt Peak Summit Dashboard is a personal project built by{' '}
                     <a href="https://www.linkedin.com/in/jamesedgarlockridge/" target="_blank" rel="noreferrer" className="text-[#75D1F5] font-bold hover:underline">James Edgar Lockridge</a>
-                    {' '}with Claude AI, 2026, so he'd stop guessing at sky conditions before driving up the mountain.
-                    It's unofficial and independent — not run by, or affiliated with, Kitt Peak Observatory or NOIRLab.
+                    {' '}with Gemini and Claude AI in 2026. It's not affiliated with the observatory or the organizations that manage it.
                   </p>
                 </div>
 
@@ -592,13 +591,13 @@ export default function App() {
         <header className="mb-10 flex flex-col md:flex-row justify-between items-end border-b pb-6 border-white/10">
           <div className="w-full md:w-auto text-left">
             <h1 className="text-5xl md:text-6xl font-thin uppercase tracking-tighter leading-none mb-4" style={{ transform: 'scaleY(1.15)', transformOrigin: 'left bottom' }}>
-                <span style={{ color: BRAND.blue }}>Kitt Peak</span> <span style={{ color: BRAND.navy }}>Dashboard</span>
+                <span style={{ color: BRAND.blue }}>Kitt Peak Summit</span> <span style={{ color: BRAND.navy }}>Dashboard</span>
             </h1>
             <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="bg-transparent border-none text-4xl md:text-5xl font-black uppercase tracking-tighter p-0 focus:ring-0 outline-none cursor-pointer text-white hover:text-[#4B9CD3] transition-colors" />
           </div>
           <div className="text-right opacity-60 w-full md:w-auto mt-6 md:mt-0 text-gray-400">
             <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end text-gray-400"><Icons.MapPin size={12} /> 31.7801° N, -111.5730° W</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end mt-1.5 text-gray-400"><Icons.Clock size={12} /> Program Window: 6 PM – 10 PM</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end mt-1.5 text-gray-400"><Icons.Clock size={12} /> Window: 6 PM – 10 PM</p>
           </div>
         </header>
 
@@ -675,7 +674,7 @@ export default function App() {
 
           <section className="space-y-4">
             <div className="flex justify-between items-center mb-4 px-2">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: BRAND.textGray }}>Scraped Telemetry</h3>
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: BRAND.textGray }}>Telemetry</h3>
                 {loading.transients && <span className="text-[9px] font-bold uppercase animate-pulse text-[#4B9CD3]">Computing Orbits...</span>}
             </div>
 
@@ -710,7 +709,7 @@ export default function App() {
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="About this dashboard"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak Dashboard v4.5</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak Summit Dashboard v4.5</p>
             </div>
         </footer>
       </div>
