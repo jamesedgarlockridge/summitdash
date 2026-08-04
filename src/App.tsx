@@ -527,6 +527,10 @@ export default function App() {
                     <a href="https://www.linkedin.com/in/jamesedgarlockridge/" target="_blank" rel="noreferrer" className="text-[#75D1F5] font-bold hover:underline">James Edgar Lockridge</a>
                     {' '}with Gemini and Claude AI in 2026. It's not affiliated with the observatory or the organizations that manage it.
                   </p>
+                  <p className="text-gray-500 text-[11px]">
+                    Icon photo by{' '}
+                    <a href="/kitt-peak-aurora-full.jpg" target="_blank" rel="noreferrer" className="text-[#75D1F5] hover:underline">Dmitry Mamyrin</a>
+                  </p>
                 </div>
 
                 <div className="pt-2 border-t border-white/5">
@@ -607,7 +611,7 @@ export default function App() {
         <div className="rounded-3xl p-8 mb-8 shadow-2xl flex flex-col justify-center items-center gap-6 relative overflow-hidden text-[#05070A]" style={{ backgroundColor: weather.color }}>
           {loading.weather && <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-10 font-bold uppercase tracking-widest text-sm animate-pulse">Syncing NWS...</div>}
           <div className="text-center w-full relative z-0">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Program Conditions</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Summit Conditions</p>
             <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-tight mt-1">{weather.status}</h2>
             <p className="text-sm font-bold uppercase opacity-80 mt-2">{weather.detail}</p>
           </div>
@@ -671,7 +675,6 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-auto p-4 rounded-xl flex gap-3 items-start bg-black/20 border" style={{ borderColor: BRAND.slate }}><Icons.Info size={14} className="shrink-0 mt-0.5" style={{ color: BRAND.cyan }} /><p className="text-[10px] font-medium opacity-90 leading-relaxed uppercase tracking-wider text-gray-300 text-left">Data verified from official NWS Graphical Forecast matching KPNO coordinates.</p></div>
           </section>
 
           <section className="space-y-4">
