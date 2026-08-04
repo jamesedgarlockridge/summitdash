@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import * as satellite from 'satellite.js';
+import profilePhoto from './assets/profile.jpg';
 
 // --- STYLING & BRAND THEME ---
 const BRAND = {
@@ -511,49 +512,53 @@ export default function App() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
             <div className="bg-[#163A58] border border-[#2B5D82] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
               <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/20">
-                <h2 className="text-xl font-black uppercase tracking-widest text-[#75D1F5]">Telemetry Sources & Failsafes</h2>
+                <h2 className="text-xl font-black uppercase tracking-widest text-[#75D1F5]">About This Dashboard</h2>
                 <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                   <Icons.X size={24} color="white" />
                 </button>
               </div>
               <div className="p-6 overflow-y-auto space-y-6 text-sm">
-                <div>
-                  <h3 className="text-[#10B981] font-black uppercase text-xs mb-2 tracking-widest">Program Conditions</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    Sourced from NOAA National Weather Service (NWS) Grid APIs using Kitt Peak's precise GPS coordinates.
-                    Failsafe: System employs an exponential backoff retry logic and hard-coded mathematical fallbacks to ensure dashboard stability during API outages.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-[#4B9CD3] font-black uppercase text-xs mb-2 tracking-widest">Astronomical Calculations</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    Sunset, Nightfall, and Moon Phase data are generated via internal high-precision astronomical algorithms calibrated for 31.78° N.
-                    Failsafe: Zero external dependencies; these values calculate correctly 100% of the time without an internet connection.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-[#F59E0B] font-black uppercase text-xs mb-2 tracking-widest">Satellite Telemetry</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    ISS and Tiangong pass predictions are computed directly from live NORAD orbital elements (CelesTrak) using SGP4 propagation — no scraping, no CORS proxies.
-                    Failsafe: A pass counts as visible only when it is above 10° elevation, still sunlit, and the sky here is dark, matching official visibility criteria.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-[#FF5F1F] font-black uppercase text-xs mb-2 tracking-widest">Rocket Launch Data</h3>
-                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
-                    Vandenberg launches are pulled from The Space Devs' Launch Library API, filtered to this program date.
-                    Failsafe: Launches still marked "TBD" (date unconfirmed) are excluded so the dashboard never reports a launch that isn't actually scheduled.
+                <div className="flex flex-col items-center text-center gap-4 pb-2">
+                  <img src={profilePhoto} alt="James Edgar Lockridge" className="w-48 h-48 rounded-full object-cover border border-white/10 shadow-xl" />
+                  <p className="text-gray-300 leading-relaxed text-[13px] max-w-sm">
+                    Kitt Peak Dashboard is a personal project built by{' '}
+                    <a href="https://www.linkedin.com/in/jamesedgarlockridge/" target="_blank" rel="noreferrer" className="text-[#75D1F5] font-bold hover:underline">James Edgar Lockridge</a>
+                    {' '}with Claude AI, 2026, so he'd stop guessing at sky conditions before driving up the mountain.
+                    It's unofficial and independent — not run by, or affiliated with, Kitt Peak Observatory or NOIRLab.
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-white/5">
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.15em] leading-relaxed">
-                    Kitt Peak VC Dashboard created by James Edgar Lockridge, 2026. Drafted in Gemini Canvas, cloudified by StackBlitz, managed in GitHub and published via Vercel.
+                <div className="pt-2 border-t border-white/5">
+                  <h3 className="text-[#10B981] font-black uppercase text-xs mb-2 tracking-widest">Weather</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    Cloud cover, wind, and temperature come from the National Weather Service's public forecast for this exact spot on the mountain.
+                    If that service doesn't respond, the dashboard retries a few times automatically before it just says so.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#4B9CD3] font-black uppercase text-xs mb-2 tracking-widest">Sun & Moon</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    Sunset, nightfall, and moon phase are worked out directly with standard astronomy formulas for this location.
+                    No outside service is involved, so these always show up correctly, even without an internet connection.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#F59E0B] font-black uppercase text-xs mb-2 tracking-widest">Satellite Passes</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    ISS and Tiangong sighting times are calculated from live, public satellite-tracking data, using the same orbit math sites like Heavens-Above use.
+                    A pass only counts as visible when the station is high enough in the sky, lit by sunlight, and it's actually dark enough here to see it.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-[#FF5F1F] font-black uppercase text-xs mb-2 tracking-widest">Rocket Launches</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    Vandenberg launch info comes from The Space Devs' public launch-tracking API, filtered to this date.
+                    Launches without a confirmed time are left out, so the dashboard won't tell you one's happening unless it actually is.
                   </p>
                 </div>
               </div>
               <div className="p-4 bg-black/40 text-center">
-                <p className="text-[10px] text-[#4B9CD3] font-black uppercase tracking-[0.2em]">Operational Integrity Protocol Active</p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Unofficial personal project — not affiliated with Kitt Peak Observatory or NOIRLab</p>
               </div>
             </div>
           </div>
@@ -587,7 +592,7 @@ export default function App() {
         <header className="mb-10 flex flex-col md:flex-row justify-between items-end border-b pb-6 border-white/10">
           <div className="w-full md:w-auto text-left">
             <h1 className="text-5xl md:text-6xl font-thin uppercase tracking-tighter leading-none mb-4" style={{ transform: 'scaleY(1.15)', transformOrigin: 'left bottom' }}>
-                <span style={{ color: BRAND.blue }}>Kitt Peak</span> <span style={{ color: BRAND.navy }}>VC Dashboard</span>
+                <span style={{ color: BRAND.blue }}>Kitt Peak</span> <span style={{ color: BRAND.navy }}>Dashboard</span>
             </h1>
             <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="bg-transparent border-none text-4xl md:text-5xl font-black uppercase tracking-tighter p-0 focus:ring-0 outline-none cursor-pointer text-white hover:text-[#4B9CD3] transition-colors" />
           </div>
@@ -704,8 +709,8 @@ export default function App() {
               <a href="tel:5202500407" className="text-[10px] font-black uppercase tracking-widest hover:underline" style={{ color: BRAND.daygloOrange }}>Telescope Engineer: (520) 250-0407</a>
             </div>
             <div className="flex items-center gap-6">
-              <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="Operational Metadata"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak VC Dashboard v4.5</p>
+              <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="About this dashboard"><Icons.Info size={20} color={BRAND.cyan} /></button>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak Dashboard v4.5</p>
             </div>
         </footer>
       </div>
