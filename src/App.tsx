@@ -297,6 +297,7 @@ export default function App() {
   const [loading, setLoading] = useState({ weather: true, transients: true });
   const [showInfo, setShowInfo] = useState(false);
   const [showRadar, setShowRadar] = useState(false);
+  const [showFullPhoto, setShowFullPhoto] = useState(false);
   const [refreshKey, setRefreshKey] = useState(Date.now());
 
   const moon = useMemo(() => getMoonData(selectedDate), [selectedDate]);
@@ -529,7 +530,7 @@ export default function App() {
                   </p>
                   <p className="text-gray-500 text-[11px]">
                     Icon photo by{' '}
-                    <a href="/kitt-peak-aurora-full.jpg" target="_blank" rel="noreferrer" className="text-[#75D1F5] hover:underline">Dmitry Mamyrin</a>
+                    <button onClick={() => setShowFullPhoto(true)} className="text-[#75D1F5] hover:underline">Dmitry Mamyrin</button>
                   </p>
                 </div>
 
@@ -594,6 +595,21 @@ export default function App() {
           </div>
         )}
 
+        {/* FULL-SIZE ICON PHOTO MODAL */}
+        {showFullPhoto && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-12 bg-black/90 backdrop-blur-xl animate-in zoom-in-95 duration-300">
+             <div className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl flex flex-col">
+                <div className="p-4 bg-[#163A58] border-b border-white/10 flex justify-between items-center">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Photo by Dmitry Mamyrin</h3>
+                    <button onClick={() => setShowFullPhoto(false)} className="p-2 bg-black/20 hover:bg-black/40 rounded-full transition-colors"><Icons.X size={24} color="white" /></button>
+                </div>
+                <div className="flex-1 flex items-center justify-center bg-[#05070A]">
+                    <img src="/kitt-peak-aurora-full.jpg" alt="Kitt Peak dome under an aurora, by Dmitry Mamyrin" className="max-w-full max-h-full object-contain" />
+                </div>
+             </div>
+          </div>
+        )}
+
         <header className="mb-10 flex flex-col md:flex-row justify-between items-end border-b pb-6 border-white/10">
           <div className="w-full md:w-auto text-left">
             <h1 className="text-5xl md:text-6xl font-thin uppercase tracking-tighter leading-none mb-4" style={{ transform: 'scaleY(1.15)', transformOrigin: 'left bottom' }}>
@@ -623,7 +639,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <section className="p-8 rounded-[2rem] space-y-8 flex flex-col shadow-lg border text-white" style={{ backgroundColor: BRAND.navy, borderColor: BRAND.slate }}>
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: BRAND.cyan }}>Atmospheric Profile (6pm–10pm)</h3>
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-center" style={{ color: BRAND.cyan }}>Atmospheric Profile (6pm–10pm)</h3>
 
             <div className="flex items-center gap-6">
               <IconBox moonPos={moon.pos} />
