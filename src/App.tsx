@@ -456,7 +456,7 @@ export default function App() {
 
         const scrapeSatellitePass = async (catalogNumber: number) => {
             try {
-                const tleText = await fetchTextWithRetry(`https://celestrak.org/NORAD/elements/gp.php?CATNR=${catalogNumber}&FORMAT=TLE`);
+                const tleText = await fetchTextWithRetry(`/api/tle?catnr=${catalogNumber}`);
                 const lines = tleText.trim().split('\n').map(l => l.trim());
                 const line1 = lines.find(l => l.startsWith('1 '));
                 const line2 = lines.find(l => l.startsWith('2 '));
@@ -545,7 +545,7 @@ export default function App() {
                     <a href="https://www.linkedin.com/in/jamesedgarlockridge/" target="_blank" rel="noreferrer" className="text-[#75D1F5] font-bold hover:underline">James Edgar Lockridge</a>
                     {' '}with Gemini and Claude AI in 2026. It's not affiliated with the observatory or the organizations that manage it.
                   </p>
-                  <p className="text-gray-500 text-[11px]">
+                  <p className="text-gray-300 text-[11px]">
                     Icon photo by{' '}
                     <button onClick={() => setShowFullPhoto(true)} className="text-[#75D1F5] hover:underline">Dmitry Mamyrin</button>
                   </p>
