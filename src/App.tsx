@@ -710,12 +710,13 @@ export default function App() {
 
           </section>
 
-          <section className="space-y-4">
+          <section className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-4 px-2">
                 <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: BRAND.textGray }}>Telemetry</h3>
                 {loading.transients && <span className="text-[9px] font-bold uppercase animate-pulse text-[#4B9CD3]">Computing Orbits...</span>}
             </div>
 
+            <div className="flex-1 flex flex-col justify-between gap-4">
             {[
               { id: 'iss', label: 'INTL. SPACE STATION PASS', icon: Icons.SpaceStation, link: 'https://heavens-above.com/PassSummary.aspx?satid=25544&lat=31.7801&lng=-111.5730&loc=Kitt+Peak&alt=2096&tz=MST' },
               { id: 'rocket', label: 'VANDENBERG LAUNCH', icon: Icons.Rocket, link: 'https://spaceflightnow.com/launch-schedule/' },
@@ -736,6 +737,7 @@ export default function App() {
                   </a>
                 );
             })}
+            </div>
           </section>
         </div>
 
