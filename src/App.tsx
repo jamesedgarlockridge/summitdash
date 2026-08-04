@@ -531,7 +531,7 @@ export default function App() {
                   <h3 className="text-[#10B981] font-black uppercase text-xs mb-2 tracking-widest">Weather</h3>
                   <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
                     Cloud cover, wind, and temperature come from the National Weather Service's public forecast for this exact spot on the mountain.
-                    If that service doesn't respond, the dashboard retries a few times automatically before it just says so.
+                    If that service doesn't respond, the dashboard retries a few times automatically before showing "Offline."
                   </p>
                 </div>
                 <div>
