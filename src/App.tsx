@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import * as satellite from 'satellite.js';
+import * as SunCalc from 'suncalc';
 import profilePhoto from './assets/profile.jpg';
 
 // --- STYLING & BRAND THEME ---
@@ -146,6 +147,21 @@ const getMoonData = (dateStr: string) => {
   const illum = Math.abs(Math.cos(pos * 2 * Math.PI - Math.PI) / 2 + 0.5);
   let name = pos < 0.05 || pos > 0.95 ? "New Moon" : pos < 0.25 ? "Waxing Crescent" : pos < 0.30 ? "First Quarter" : pos < 0.45 ? "Waxing Gibbous" : pos < 0.55 ? "Full Moon" : pos < 0.70 ? "Waning Gibbous" : pos < 0.75 ? "Last Quarter" : "Waning Crescent";
   return { pos, illum: Math.round(illum * 100), name };
+};
+
+// Whether the Moon is above the horizon at any point during the 6pm-10pm
+// program window — phase alone doesn't say if moonlight will actually be
+// a factor tonight. Uses suncalc (validated against a real reference
+// moonrise/moonset time) rather than a hand-derived formula.
+const getMoonVisibility = (dateStr: string) => {
+  const LAT = 31.7801;
+  const LON = -111.5730;
+  const windowStartMs = new Date(`${dateStr}T18:00:00-07:00`).getTime();
+  const windowEndMs = new Date(`${dateStr}T22:00:00-07:00`).getTime();
+  for (let t = windowStartMs; t <= windowEndMs; t += 10 * 60000) {
+    if (SunCalc.getMoonPosition(new Date(t), LAT, LON).altitude > 0) return true;
+  }
+  return false;
 };
 
 const fetchWithRetry = async (url: string, options: RequestInit, retries = 3, backoff = 1000): Promise<any> => {
@@ -301,6 +317,7 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(Date.now());
 
   const moon = useMemo(() => getMoonData(selectedDate), [selectedDate]);
+  const moonVisible = useMemo(() => getMoonVisibility(selectedDate), [selectedDate]);
   const sunset = useMemo(() => calculateSellsSunset(selectedDate), [selectedDate]);
   const nightfall = useMemo(() => calculateNightfall(selectedDate), [selectedDate]);
 
@@ -645,7 +662,7 @@ export default function App() {
               <IconBox moonPos={moon.pos} />
               <div className="text-left">
                 <p className="text-xl font-black uppercase tracking-tight leading-none mb-1">{moon.name}</p>
-                <p className="text-[10px] font-bold uppercase opacity-80 text-gray-400">Illumination: {moon.illum}%</p>
+                <p className="text-[10px] font-bold uppercase opacity-80 text-gray-400">{moonVisible ? `Visible: Illumination ${moon.illum}%` : 'Not Visible'}</p>
               </div>
             </div>
 

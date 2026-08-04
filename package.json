@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/suncalc": "^1.9.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "satellite.js": "^5.0.0"
+    "satellite.js": "^5.0.0",
+    "suncalc": "^2.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
