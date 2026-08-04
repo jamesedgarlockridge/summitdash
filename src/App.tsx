@@ -620,7 +620,7 @@ export default function App() {
                     <h3 className="text-sm font-black uppercase tracking-widest text-white">Photo by Dmitry Mamyrin</h3>
                     <button onClick={() => setShowFullPhoto(false)} className="p-2 bg-black/20 hover:bg-black/40 rounded-full transition-colors"><Icons.X size={24} color="white" /></button>
                 </div>
-                <div className="flex-1 flex items-center justify-center bg-[#05070A]">
+                <div className="flex-1 min-h-0 min-w-0 flex items-center justify-center bg-[#05070A] overflow-hidden">
                     <img src="/kitt-peak-aurora-full.jpg" alt="Kitt Peak dome under an aurora, by Dmitry Mamyrin" className="max-w-full max-h-full object-contain" />
                 </div>
              </div>
