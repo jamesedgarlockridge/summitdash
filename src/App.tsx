@@ -632,10 +632,10 @@ export default function App() {
             <h1 className="text-5xl md:text-6xl font-thin uppercase tracking-tighter leading-none mb-4" style={{ transform: 'scaleY(1.15)', transformOrigin: 'left bottom' }}>
                 <span style={{ color: BRAND.blue }}>Kitt Peak Summit</span> <span style={{ color: BRAND.navy }}>Dashboard</span>
             </h1>
-            <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="bg-transparent border-none text-4xl md:text-5xl font-black uppercase tracking-tighter p-0 focus:ring-0 outline-none cursor-pointer text-white hover:text-[#4B9CD3] transition-colors" />
+            <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="bg-transparent border-none text-4xl md:text-5xl font-black uppercase tracking-tighter p-0 focus:ring-0 outline-none cursor-pointer text-white hover:text-[#4B9CD3] transition-colors [&::-webkit-calendar-picker-indicator]:hidden" />
           </div>
           <div className="text-right opacity-60 w-full md:w-auto mt-6 md:mt-0 text-gray-400">
-            <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end text-gray-400"><Icons.MapPin size={12} /> 31.7801° N, -111.5730° W</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end text-gray-400 whitespace-nowrap"><Icons.MapPin size={12} /> 31.7801° N, -111.5730° W</p>
             <p className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 justify-end mt-1.5 text-gray-400"><Icons.Clock size={12} /> Window: 6 PM – 10 PM</p>
           </div>
         </header>
