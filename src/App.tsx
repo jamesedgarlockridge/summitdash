@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import * as satellite from 'satellite.js';
 import * as SunCalc from 'suncalc';
 import profilePhoto from './assets/profile.jpg';
+import stormAlertSound from './assets/storm-alert.wav';
 
 // --- STYLING & BRAND THEME ---
 const BRAND = {
@@ -315,6 +316,8 @@ export default function App() {
   const [showRadar, setShowRadar] = useState(false);
   const [showFullPhoto, setShowFullPhoto] = useState(false);
   const [refreshKey, setRefreshKey] = useState(Date.now());
+  const [stormAlert, setStormAlert] = useState<{ event: string, headline: string } | null>(null);
+  const announcedStormIdsRef = useRef<Set<string>>(new Set());
 
   const moon = useMemo(() => getMoonData(selectedDate), [selectedDate]);
   const moonVisible = useMemo(() => getMoonVisibility(selectedDate), [selectedDate]);
@@ -324,6 +327,42 @@ export default function App() {
   useEffect(() => {
     const interval = setInterval(() => setRefreshKey(Date.now()), 60000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Checks for a real, currently-active NWS Severe Thunderstorm or Tornado
+  // Warning covering this exact point — not a lightning-strike count, since
+  // there's no honest free source for that (see the info card). This is an
+  // official human-issued warning, always live, independent of the picked date.
+  useEffect(() => {
+    let active = true;
+    const STORM_ALERT_EVENTS = ['Severe Thunderstorm Warning', 'Tornado Warning'];
+    async function checkStormAlerts() {
+      try {
+        const res = await fetch('https://api.weather.gov/alerts/active?point=31.7801,-111.5730', {
+          headers: { 'User-Agent': 'KittPeakSummitDashboard/1.0' }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!active) return;
+
+        const relevant = (data.features || []).filter((f: any) => STORM_ALERT_EVENTS.includes(f.properties?.event));
+        if (relevant.length > 0) {
+          const alert = relevant[0];
+          setStormAlert({ event: alert.properties.event, headline: alert.properties.headline });
+          if (!announcedStormIdsRef.current.has(alert.properties.id)) {
+            announcedStormIdsRef.current.add(alert.properties.id);
+            new Audio(stormAlertSound).play().catch(() => {});
+          }
+        } else {
+          setStormAlert(null);
+        }
+      } catch (e) {
+        // stay quiet on a transient network error rather than show a false alert
+      }
+    }
+    checkStormAlerts();
+    const interval = setInterval(checkStormAlerts, 60000);
+    return () => { active = false; clearInterval(interval); };
   }, []);
 
   useEffect(() => {
@@ -579,6 +618,13 @@ export default function App() {
                     Launches without a confirmed time are left out, so the dashboard won't tell you one's happening unless it actually is.
                   </p>
                 </div>
+                <div>
+                  <h3 className="text-[#EF4444] font-black uppercase text-xs mb-2 tracking-widest">Storm Alert</h3>
+                  <p className="text-gray-300 leading-relaxed uppercase font-medium tracking-wide text-[11px]">
+                    This shows a real Severe Thunderstorm or Tornado Warning from the National Weather Service when one is active for this exact spot, checked every minute.
+                    It's an official human-issued warning, not a lightning-strike count — there's no honest free source for real-time strike data, so this dashboard doesn't pretend to have one.
+                  </p>
+                </div>
               </div>
               <div className="p-4 bg-black/40 text-center">
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">This app is free. Enjoy the sky!</p>
@@ -624,6 +670,16 @@ export default function App() {
                     <img src="/kitt-peak-aurora-full.jpg" alt="Kitt Peak dome under an aurora, by Dmitry Mamyrin" className="max-w-full max-h-full object-contain" />
                 </div>
              </div>
+          </div>
+        )}
+
+        {stormAlert && (
+          <div className="mb-6 p-4 rounded-2xl border-2 flex items-center gap-3" style={{ backgroundColor: '#FACC15', borderColor: '#92620a' }}>
+            <Icons.Info size={22} color="#05070A" className="shrink-0" />
+            <div className="text-left">
+              <p className="font-black uppercase text-sm tracking-wide text-[#05070A]">{stormAlert.event}</p>
+              <p className="text-[11px] font-medium text-[#05070A] opacity-80">{stormAlert.headline}</p>
+            </div>
           </div>
         )}
 
