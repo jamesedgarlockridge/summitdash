@@ -803,7 +803,7 @@ export default function App() {
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setShowInfo(true)} className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 border border-white/5" title="About this dashboard"><Icons.Info size={20} color={BRAND.cyan} /></button>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak Summit Dashboard v4.5</p>
+              <p className="text-[9px] font-bold uppercase tracking-widest text-gray-600">Kitt Peak Summit Dashboard v5.0</p>
             </div>
         </footer>
       </div>
