@@ -627,7 +627,7 @@ export default function App() {
                 </div>
               </div>
               <div className="p-4 bg-black/40 text-center">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">This app is free. Enjoy the sky!</p>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">This app is free for the KPNO family!</p>
               </div>
             </div>
           </div>
