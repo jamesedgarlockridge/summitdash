@@ -582,7 +582,7 @@ export default function App() {
                   <p className="text-gray-300 leading-relaxed text-[13px] max-w-sm">
                     Kitt Peak Summit Dashboard is a personal project built by{' '}
                     <a href="https://www.linkedin.com/in/jamesedgarlockridge/" target="_blank" rel="noreferrer" className="text-[#75D1F5] font-bold hover:underline">James Edgar Lockridge</a>
-                    {' '}with Gemini and Claude AI in 2026. It's not affiliated with the observatory or the organizations that manage it.
+                    {' '}with Gemini and Claude AI. It's not affiliated with the observatory or the organizations that manage it.
                   </p>
                   <p className="text-gray-300 text-[11px]">
                     Icon photo by{' '}
