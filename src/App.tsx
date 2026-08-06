@@ -683,7 +683,7 @@ export default function App() {
           </div>
         )}
 
-        <header className="mb-10 flex flex-col md:flex-row justify-between items-end border-b pb-6 border-white/10">
+        <header className="mb-10 flex flex-col md:flex-row justify-between items-end">
           <div className="w-full md:w-auto text-left">
             <h1 className="text-5xl md:text-6xl font-thin uppercase tracking-tighter leading-none mb-4" style={{ transform: 'scaleY(1.15)', transformOrigin: 'left bottom' }}>
                 <span style={{ color: BRAND.blue }}>Kitt Peak Summit</span> <span style={{ color: BRAND.navy }}>Dashboard</span>
